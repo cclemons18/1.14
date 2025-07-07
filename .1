@@ -1,0 +1,251 @@
+#!/bin/bash
+
+# ---------------------------
+# 🌐 Global Pulse Hub - Build & Deploy Script
+# ---------------------------
+
+# Set paths
+SRC_TEMPLATE="src/index.template.html"
+DIST_DIR="dist"
+DIST_HTML="$DIST_DIR/index.html"
+REPO_URL="https://github.com/YOUR_USERNAME/YOUR_REPO.git"  # Replace with actual repo
+BRANCH="gh-pages"
+
+# Generate secure nonce for CSP
+NONCE=$(openssl rand -base64 16)
+
+# Create dist folder if not exists
+mkdir -p "$DIST_DIR"
+
+# Replace all CSP nonce placeholders
+sed "s/{{RANDOM_NONCE}}/$NONCE/g" "$SRC_TEMPLATE" > "$DIST_HTML"
+
+# Display success messages
+echo "✅ HTML built with CSP nonce."
+echo "🔐 Nonce: $NONCE"
+echo "📁 Output: $DIST_HTML"
+
+# Deploy to GitHub Pages
+echo "🚀 Deploying to GitHub Pages..."
+cd "$DIST_DIR"
+git init
+
+git remote add origin "$REPO_URL" 2> /dev/null
+git checkout -b "$BRANCH"
+git add .
+git commit -m "Deploy Global Pulse Hub - $(date '+%Y-%m-%d %H:%M:%S')"
+git push -f origin "$BRANCH"
+cd ..
+
+echo "✅ Deployment complete on GitHub Pages (branch: $BRANCH)"
+echo "🌍 Visit your site at: https://YOUR_USERNAME.github.io/YOUR_REPO"
+
+# Optional: Uncomment to deploy via Netlify CLI
+# netlify deploy --dir=dist --prod
+
+# Optional: open in browser
+# open "$DIST_HTML"
+
+# ---------------------------
+# 📄 HTML Template Below (index.template.html)
+# ---------------------------
+
+cat <<EOF > "$SRC_TEMPLATE"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Global Pulse Hub</title>
+
+  <!-- Hardened CSP with Nonce -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' https://www.googletagmanager.com https://pagead2.googlesyndication.com 'nonce-{{RANDOM_NONCE}}';
+    style-src 'self' 'nonce-{{RANDOM_NONCE}}';
+    img-src 'self' data: https:;
+    frame-src https://www.blockchain.com https://www.renewableenergyworld.com https://waterwatch.usgs.gov https://queue-times.com https://www.youtube.com https://*.google.com https://*.googlesyndication.com https://*.doubleclick.net https:;
+    connect-src 'self' https://www.google-analytics.com;
+    font-src 'self' https://fonts.gstatic.com;
+    object-src 'none';
+    base-uri 'self';
+  " />
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Live global data insights from crypto mining to environmental stats. Explore trending analytics from free open-source datasets worldwide." />
+  <meta name="keywords" content="free data, crypto mining, open data, bitcoin, environmental data, air quality, social media trends, open access, public health, economics, streaming media, renewable energy, theme parks, ride wait times" />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="Global Pulse Hub" />
+  <meta property="og:title" content="Global Pulse Hub" />
+  <meta property="og:description" content="Live global data insights including crypto, weather, and renewable energy." />
+  <meta property="og:image" content="https://yourdomain.com/preview-image.jpg" />
+  <meta property="og:url" content="https://yourdomain.com" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+  <!-- Google Analytics -->
+  <script nonce="{{RANDOM_NONCE}}" async src="https://www.googletagmanager.com/gtag/js?id=G-NF132JZ2QX"></script>
+  <script nonce="{{RANDOM_NONCE}}">
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-NF132JZ2QX');
+    function trackView(section) {
+      gtag('event', 'page_view', {
+        'page_path': '/' + section,
+        'page_title': section.replace(/-/g, ' ').toUpperCase()
+      });
+    }
+  </script>
+
+  <!-- Google AdSense -->
+  <script nonce="{{RANDOM_NONCE}}" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js" crossorigin="anonymous"></script>
+  <script nonce="{{RANDOM_NONCE}}">
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+
+  <!-- Inline CSS -->
+  <style nonce="{{RANDOM_NONCE}}">
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f5f5f5; }
+    header, footer { background: #20232a; color: white; padding: 1em; text-align: center; }
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      background-color: #20232a;
+      padding: 1em;
+      gap: 0.5em;
+    }
+    nav button {
+      background-color: #fff;
+      color: #20232a;
+      border: 2px solid #007BFF;
+      padding: 0.5em 1em;
+      font-size: 1em;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+    nav button:hover {
+      background-color: #007BFF;
+      color: white;
+    }
+    nav button.active {
+      background-color: #007BFF;
+      color: white;
+      font-weight: bold;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    }
+    section { padding: 2em; display: none; background: white; }
+    h1, h2, h3 { color: #20232a; }
+    ul { list-style-type: none; padding: 0; }
+    ul li { padding: 0.3em 0; }
+    a { color: #007BFF; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    iframe.refreshable { border: none; width: 100%; height: 400px; }
+  </style>
+
+  <script nonce="{{RANDOM_NONCE}}">
+    function toggleView(id) {
+      const sections = document.querySelectorAll('section');
+      sections.forEach(sec => sec.style.display = 'none');
+      const selected = document.getElementById(id);
+      if (selected) {
+        selected.style.display = 'block';
+        trackView(id);
+      }
+      const buttons = document.querySelectorAll('nav button');
+      buttons.forEach(btn => btn.classList.remove('active'));
+      const activeButton = document.getElementById('btn-' + id);
+      if (activeButton) {
+        activeButton.classList.add('active');
+      }
+    }
+    window.onload = () => {
+      toggleView('mining-data');
+      setInterval(() => {
+        document.querySelectorAll('iframe.refreshable').forEach(iframe => {
+          iframe.src = iframe.src;
+        });
+      }, 330000);
+    }
+  </script>
+</head>
+<body>
+  <header>
+    <h1>Global Pulse Hub</h1>
+    <p>Live insights from over 100 global niches</p>
+  </header>
+  <nav>
+    <button onclick="toggleView('mining-data')" id="btn-mining-data">Crypto Mining</button>
+    <button onclick="toggleView('renewable-energy')" id="btn-renewable-energy">Renewable Energy</button>
+    <button onclick="toggleView('streaming-media')" id="btn-streaming-media">Streaming Media</button>
+    <button onclick="toggleView('local-honey')" id="btn-local-honey">Local Honey & Pollinator Plants</button>
+    <button onclick="toggleView('outdoors')" id="btn-outdoors">Fishing, Trails & River Data</button>
+    <button onclick="toggleView('theme-parks')" id="btn-theme-parks">Theme Parks & Ride Times</button>
+  </nav>
+  <section id="mining-data">
+    <h2>Live Crypto Mining Statistics</h2>
+    <iframe class="refreshable" src="https://www.blockchain.com/explorer"></iframe>
+  </section>
+  <section id="renewable-energy">
+    <h2>AI Renewable Energy Blog</h2>
+    <iframe class="refreshable" src="https://www.renewableenergyworld.com/feed/"></iframe>
+    <ul>
+      <li><a href="https://www.solarreviews.com/" target="_blank" rel="noopener noreferrer">Top Residential Solar Products</a></li>
+      <li><a href="https://www.energysage.com/" target="_blank" rel="noopener noreferrer">EnergySage Solar Marketplace</a></li>
+      <li><a href="https://www.nrel.gov/" target="_blank" rel="noopener noreferrer">NREL - Renewable Energy Lab</a></li>
+      <li><a href="https://www.youtube.com/results?search_query=DIY+solar+wind+hydro+biomass+projects" target="_blank" rel="noopener noreferrer">Renewable Energy DIY Videos</a></li>
+    </ul>
+  </section>
+  <section id="streaming-media">
+    <h2>Streaming Media Platforms</h2>
+    <ul>
+      <li><a href="https://www.netflix.com" target="_blank" rel="noopener noreferrer">Netflix</a></li>
+      <li><a href="https://www.max.com" target="_blank" rel="noopener noreferrer">HBO Max</a></li>
+      <li><a href="https://www.paramountplus.com" target="_blank" rel="noopener noreferrer">Paramount+</a></li>
+      <li><a href="https://www.mgmplus.com" target="_blank" rel="noopener noreferrer">MGM+</a></li>
+      <li><a href="https://tv.apple.com" target="_blank" rel="noopener noreferrer">Apple TV+</a></li>
+      <li><a href="https://www.amcplus.com" target="_blank" rel="noopener noreferrer">AMC+</a></li>
+      <li><a href="https://www.disneyplus.com" target="_blank" rel="noopener noreferrer">Disney+</a></li>
+      <li><a href="https://www.primevideo.com" target="_blank" rel="noopener noreferrer">Amazon Prime Video</a></li>
+      <li><a href="https://www.hulu.com" target="_blank" rel="noopener noreferrer">Hulu</a></li>
+      <li><a href="https://www.peacocktv.com" target="_blank" rel="noopener noreferrer">Peacock</a></li>
+      <li><a href="https://www.discoveryplus.com" target="_blank" rel="noopener noreferrer">Discovery+</a></li>
+    </ul>
+  </section>
+  <section id="local-honey">
+    <h2>Local Honey Suppliers & Pollinator Plants</h2>
+    <ul>
+      <li><a href="https://www.honey.com/honey-locator" target="_blank" rel="noopener noreferrer">Find Local Honey (USA National Honey Board)</a></li>
+      <li><a href="https://www.pollinator.org/guides" target="_blank" rel="noopener noreferrer">Pollinator-Friendly Planting Guides by Region</a></li>
+      <li><a href="https://www.localharvest.org/honey.jsp" target="_blank" rel="noopener noreferrer">LocalHarvest Honey Listings</a></li>
+      <li><a href="https://www.youtube.com/results?search_query=bee+keeping+for+beginners" target="_blank" rel="noopener noreferrer">Beekeeping DIY Videos</a></li>
+    </ul>
+  </section>
+  <section id="outdoors">
+    <h2>Fishing, Trail Maps & River Data</h2>
+    <ul>
+      <li><a href="https://www.alltrails.com" target="_blank" rel="noopener noreferrer">Find Recreational Trails – AllTrails</a></li>
+      <li><a href="https://waterdata.usgs.gov/nwis" target="_blank" rel="noopener noreferrer">USGS River Water Data</a></li>
+      <li><a href="https://www.fishing.org" target="_blank" rel="noopener noreferrer">Fishing.org – Global Fishing Destinations</a></li>
+      <li><a href="https://www.fisheries.noaa.gov" target="_blank" rel="noopener noreferrer">NOAA Fisheries (U.S. Data)</a></li>
+    </ul>
+    <iframe class="refreshable" src="https://waterwatch.usgs.gov/?m=real&r=us&w=map"></iframe>
+  </section>
+  <section id="theme-parks">
+    <h2>Theme Parks Ride Times & News</h2>
+    <ul>
+      <li><a href="https://www.wdwmagic.com" target="_blank" rel="noopener noreferrer">Walt Disney World Wait Times & Updates</a></li>
+      <li><a href="https://www.disneylandparis.com/en-us/tickets/wait-times/" target="_blank" rel="noopener noreferrer">Disneyland Paris Ride Waits</a></li>
+      <li><a href="https://www.themeparktourist.com" target="_blank" rel="noopener noreferrer">Theme Park Tourist News</a></li>
+      <li><a href="https://www.universalorlando.com/web/en/us/plan-your-visit/hours-information/park-hours" target="_blank" rel="noopener noreferrer">Universal Orlando Wait Times</a></li>
+      <li><a href="https://queue-times.com" target="_blank" rel="noopener noreferrer">Queue Times – Global Theme Parks</a></li>
+    </ul>
+    <iframe class="refreshable" src="https://queue-times.com"></iframe>
+  </section>
+  <footer>
+    <p>&copy; 2025 Global Pulse Hub. All rights reserved.</p>
+  </footer>
+</body>
+</html>
+EOF
